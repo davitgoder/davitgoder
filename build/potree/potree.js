@@ -16853,7 +16853,7 @@ void main() {
 				}
 
 				{
-					let light = new THREE.DirectionalLight(0xffffff);
+					let light = new THREE.DirectionalLight(0x898787);
 					light.position.set(-10, 10, 1);
 					light.target.position.set(0, 0, 0);
 					this.scene.add(light);
@@ -19105,6 +19105,7 @@ ENDSEC
 		}
 
 		update() {
+			
 
 		}
 	}
@@ -19717,6 +19718,7 @@ ENDSEC
 		}
 
 		update() {
+
 			let elCoordiantesContainer = this.elContent.find('.coordinates_table_container');
 			elCoordiantesContainer.empty();
 			elCoordiantesContainer.append(this.createCoordinatesTable([this.measurement.position]));
@@ -24944,7 +24946,9 @@ ENDSEC
 
 		}
 
-		update(delta, timestamp) {
+		update(delta, timestamp) { //_goder
+
+			
 
 			if (Potree.measureTimings) performance.mark("update-start");
 

@@ -141,6 +141,8 @@
 
 		<script>
 
+			//get the current url, number after url will be the pin id
+			//TODO: __3__ go to corresponding id	
 			function get_url() {
 				var url_string = document.URL;
 				var tree_ides = url_string.split("/");
@@ -151,14 +153,9 @@
 
 		<script>
 
-
 			this.readJSON("build/data.json");// initilze trees
-
 			var json_string;
 
-			function Example() {
-				console.log("Example called");
-			}
 			function search_tree() {
 
 				var input;
@@ -166,11 +163,13 @@
 
 				let search_word = input.value;
 
-				for (let i = 0; i < pin_objects.length; i++) { // todo: dictionary 
-					if (search_word == "test") {
+				//for testing
+				for (let i = 0; i < pin_objects.length; i++) {
+					if (search_word == pin_objects[i].person_name) { // pick any tree 
 
 						this.go_to_tree(pin_objects[i]);
-
+						console.log("color: ", pin_objects[i].mesh_obj);
+						//	pin_objects[i].mesh_obj.children[0].material.emissive[0] =  new THREE.Color( 0xff0000 );
 						return;
 					}
 				}
@@ -198,19 +197,21 @@
 			}
 
 
+			// go to tree
+			//TODO __1__ go smoothly and with lookrotation
 			function go_to_tree(tree_obj) {// _goder
 
-				//this.screenshot();
+				this.screenshot();
 
 				let final_postion = tree_obj.mesh_obj.position;
 				pin_image.style.right = "-302px";
 				pin_image.style.right = "0px";
 				let person_name = document.getElementById("Name");
 				let plant_date = document.getElementById("Date");
+
+				//  add person name to and plant date to canvas element
 				//	person_name.innerHTML = tree_obj.person_name;
 				//	plant_date.innerHTML = tree_obj.plant_date;
-
-
 
 				var v_pos = viewer.scene.view.position;
 				var postion_diff = new THREE.Vector3(Math.abs(final_postion["x"] - v_pos.x),
@@ -227,27 +228,54 @@
 
 
 
-				console.log(viewer.scene.cameraO);
+				var targetQuaternion = tree_obj.mesh_obj.rotation;
+				// // camera original position
+				// var cameraPosition = viewer.scene.cameraP.position.clone();
 
-				//viewer.scene.cameraP.lookAt(zoom_positon);
-				//				viewer.scene.view.lookAt(.position);
+				// // object3D position
+				// var objectPosition = final_postion.clone();
 
+				// // direction vector from camera towards object3D
+				// var direction = objectPosition.sub(cameraPosition);
+
+
+				// console.log("cameraPosition: ", cameraPosition);
+				// console.log("objectPosition: ", objectPosition);
+				// console.log("direction: ", direction);
+
+
+				// // compute Euler angle
+				// var angle = new THREE.Euler();
+				// angle.setFromVector3(direction);
+
+				//	viewer.scene.cameraO.quaternion.slerp(targetQuaternion, t); //t = normalized value 0 to 1
+
+
+				var vqr = new THREE.Vector3(final_postion.x, final_postion.y, final_postion.z);
+				viewer.scene.view.lookAt(vqr);
+
+				console.log("camera: ", viewer.scene.cameraP);
 			}
 
 			var image_url;
 
-			function screenshot() { // take shortcut
+			//TODO: __2__ upload generated image to facebook
+			function screenshot() { // take shortcut of canvas element
 				html2canvas(document.querySelector("#pin_image"), {
 					onrendered: function (canvas) {
 						let pngUrl = canvas.toDataURL();
 						let img = document.querySelector(".shcreensh");
 						img.src = pngUrl;
-						image_url = pngUrl;
-						let image = convertURIToImageData(pngUrl);
+						image_url = pngUrl;  // <--- upload image_url to facebook
+
+						console.log("generated image:   ", image_url); // <-------- image_url contains image
+
+
+						//let image = convertURIToImageData(pngUrl);
+						console.log("image: ", image);
 						document.getElementById("tree_image").src = pngUrl;
 					},
 				});
-				return image_url;
 			}
 
 			function dataURItoBlob(dataURI) {
@@ -276,6 +304,7 @@
 						resolve(context.getImageData(0, 0, canvas.width, canvas.height));
 					}, false);
 					image.src = URI;
+					
 				});
 			}
 
@@ -287,7 +316,7 @@
 				window.open('https://twitter.com/share?url=' + document.URL, 'twitter-popup', 'height=350,width=600'); return false;
 			}
 
-			//let pin_image = document.getElementById("pin_image");
+
 
 			window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
@@ -311,7 +340,7 @@
 				viewer.toggleSidebar();
 			});
 
-			// Sigeom Poin Cloud
+			//load point cloud
 			Potree.loadPointCloud("./pointclouds/vol_total/cloud.js", "sigeom.sa", function (e) {
 				let scene = viewer.scene;
 				scene.addPointCloud(e.pointcloud);
@@ -326,44 +355,10 @@
 			});
 
 
-			// { // ANNOTATIONS
-
 			let scene = viewer.scene;
 
 
 
-			// scene.annotations.add(new Potree.Annotation({
-			// 	position: [589808.587, 231525.213, 771.334],
-			// 	title: "Pasha Bank",
-			// 	description: `
-			// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
-			// 		`
-			// }));
-
-
-			// scene.annotations.add(new Potree.Annotation({
-			// 	position: [590041.587, 231525.213, 755.334],
-			// 	title: "Good Green Moving",
-			// 	description: `
-			// 		<img src="./resources/images/ee.jpg" class="pasha-bank-tree"/>
-			// 		`
-			// }));
-
-			// scene.annotations.add(new Potree.Annotation({
-			// 	position: [589930.587, 231525.213, 755.334],
-			// 	title: "pasha bank",
-			// 	description: `
-			// 		<img src="./resources/images/tree.png" class="pasha-bank-tree"/>
-			// 		`
-			// }));
-
-			// scene.annotations.add(new Potree.Annotation({
-			// 	position: [589697.587, 231525.213, 779.334],
-			// 	title: "Good Green Moving",
-			// 	description: `
-			// 		<img src="./resources/images/ee2.png" class="pasha-bank-tree"/>
-			// 		`
-			// }));
 
 			var pin_objects = [];
 
@@ -389,8 +384,7 @@
 				};
 
 
-				//let plane_texture = textureLoader.load('./resources/textures/PamTexture1.png');
-				let soil_texture = textureLoader.load('./resources/textures/soil5.png');
+				let soil_texture = textureLoader.load('./resources/textures/soil8.jpg');
 
 				let pin_texture = textureLoader.load('./resources/textures/pintexture.png');
 
@@ -400,8 +394,7 @@
 						console.log(Math.round(percentComplete, 2) + '% downloaded');
 					}
 				};
-				//plane_texture.wrapS = THREE.RepeatWrapping;
-				//plane_texture.wrapT = THREE.RepeatWrapping;
+
 
 
 				soil_texture.wrapS = THREE.RepeatWrapping;
@@ -473,11 +466,11 @@
 
 
 
-					
+
 				}, onProgress, onError);
 
 
-			
+
 
 				draw();
 
@@ -505,7 +498,7 @@
 				};
 
 
-				//TODO: optimize instanciating
+
 				function object_loader(position) {
 					loader.load('./resources/models/XE.obj', function (object) {
 						object.traverse(function (child) {
